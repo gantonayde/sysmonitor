@@ -1,7 +1,0 @@
-Use subprocess to execute bash commands in order to get information about the system.
-Check system state every N seconds. 
-Store system state for every criteria in a 1D array, i.e. [0, 0, 0, 0, 0]
-If system load > 80% add +1 to a criteria, if system load < 80%, integer = 0. 
-If system load > 80% for TIME/N, write a log file.
-
-sudo python /home/pi/sample.py & > /home/pi/Desktop/log.txt 2>&1
