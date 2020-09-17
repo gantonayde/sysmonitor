@@ -28,6 +28,7 @@ elif [ $RC ] && ! [ $REMOVE ]; then
     if grep -Fxq "sudo python3 ${SYSMONITOR_DIR}/${SERVICE_NAME}.py & > ${SYSMONITOR_DIR}/log.txt 2>&1" service/rc.local; then
         echo "${SERVICE_NAME}.py is already installed."
     else
+        pip3 install -r requirements.txt 
         sudo sed -i "/^exit 0/i sudo python3 ${SYSMONITOR_DIR}/${SERVICE_NAME}.py & > ${SYSMONITOR_DIR}/log.txt 2>&1" ${RC_LOCAL_DIR}/rc.local
         echo "${SERVICE_NAME}.py installed. Please reboot the system."
     fi    
@@ -36,6 +37,7 @@ elif [ $RC ] && [ $REMOVE ]; then
     sudo mv ${RC_LOCAL_DIR}/rc.local2 ${RC_LOCAL_DIR}/rc.local
     echo "${SERVICE_NAME}.py removed. Please reboot the system."
 else
+    pip3 install -r requirements.txt 
     sudo SYSMONITOR_DIR=${SYSMONITOR_DIR} USERNAME=${USERNAME} SERVICE_NAME=${SERVICE_NAME} envsubst < service/sysmonitor_test.service > ${SERVICE_NAME}.service
     sudo mv ${SERVICE_NAME}.service /lib/systemd/system/${SERVICE_NAME}.service
     sudo chmod 644 /lib/systemd/system/${SERVICE_NAME}.service
