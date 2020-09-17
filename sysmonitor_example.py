@@ -8,12 +8,12 @@ import pandas as pd
 from datetime import datetime
 
 
-MEMORY_LOAD = 1                         # Memory load threshold in % 
+MEMORY_USAGE = 80                       # Memory usage threshold in % 
 NPROC = 5                               # Number of processes to log
 LOG_DIR = os.getcwd()                   # Location of log files
 MEM_CHECK_FREQ = int(3)                 # Memory check up frequency in seconds
 LOG_SET_OFF_TIME = int(15)              # Begin logging after 15 seconds
-LOG_INTERVALS = int(10*60)              # Write a new entry every 10 mins after the initial one if the system load continues to be > MEMORY_LOAD
+LOG_INTERVALS = int(10*60)              # Write a new entry every 10 mins after the initial one if the memory usage continues to be > MEMORY_USAGE
 T_UNDER_LOAD = {'mem': 0}               # Time under load in LOG_SET_OFF_TIME//MEM_CHECK_FREQ
 SET_OFF_STEP = LOG_SET_OFF_TIME//MEM_CHECK_FREQ # Define when to start logging in the units of T_UNDER_LOAD
 
@@ -28,12 +28,12 @@ def get_current_time():
     current_time = now.strftime("%H:%M:%S %d/%m/%y")
     return current_time
 
-def get_mem_load():
+def get_mem_usage():
     '''
-    Measure memory (RSS) load.
+    Measure memory (RSS) usage.
     '''
-    memory_load = psutil.virtual_memory().percent
-    return memory_load
+    memory_usage = psutil.virtual_memory().percent
+    return memory_usage
 
 def get_proc_by_memory(num_processes=NPROC):
     '''
@@ -75,10 +75,9 @@ def get_details_with_shell(cmd):
     return details
 
 if __name__ == '__main__':
-    i = 0
-    while i < 5:
-        memory_load = get_mem_load()
-        if memory_load > MEMORY_LOAD:
+    while True:
+        memory_usage = get_mem_usage()
+        if memory_usage > MEMORY_USAGE:
             T_UNDER_LOAD['mem'] += 1
             if T_UNDER_LOAD['mem'] == int(LOG_SET_OFF_TIME//MEM_CHECK_FREQ) or (T_UNDER_LOAD['mem'] % int(LOG_INTERVALS//MEM_CHECK_FREQ)) == 0:
                 proc_info = get_proc_by_memory()
@@ -91,12 +90,12 @@ if __name__ == '__main__':
                     else:
                         log_file.write(f"CONTINUING THE LOG WHICH STARTED {((T_UNDER_LOAD['mem']*MEM_CHECK_FREQ)-LOG_SET_OFF_TIME)//60} MINUTES AGO\n")
                     log_file.write(f"TIME: {get_current_time()}\n")   
-                    log_file.write(f"MEMORY LOAD: {memory_load}%\n")
+                    log_file.write(f"MEMORY USAGE: {memory_usage}%\n")
                     log_file.write(f"{proc_info.to_string(header = True, index = True)}\n\n")
 
                 with open(os.path.join(LOG_DIR, PROC_DETAILS_FILENAME),'a') as details_log_file:
                     details_log_file.write(f"TIME: {get_current_time()}\n")
-                    details_log_file.write(f"MEMORY LOAD: {memory_load}%\n")
+                    details_log_file.write(f"MEMORY USAGE: {memory_usage}%\n")
                     if T_UNDER_LOAD['mem'] == int(LOG_SET_OFF_TIME//MEM_CHECK_FREQ):
                         details_log_file.write(f"NEW LOG\n")
                     else:
@@ -111,6 +110,5 @@ if __name__ == '__main__':
                         details_log_file.write(f"{proc_status}\n")
         else:
             T_UNDER_LOAD['mem'] = 0
-
+            
         time.sleep(MEM_CHECK_FREQ)
-        i += 1

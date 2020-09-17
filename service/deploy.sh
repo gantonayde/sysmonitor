@@ -3,7 +3,6 @@
 SYSMONITOR_DIR=`pwd`
 USERNAME=`whoami`
 SERVICE_NAME='sysmonitor_example'
-RC_LOCAL_DIR='/etc'
 
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -11,31 +10,16 @@ while [[ $# -gt 0 ]]; do
         -r|--remove)
         REMOVE=true
         ;;
-        -rc|--rclocal)
-        RC=true
-        ;;
     esac
     shift
 done
 
-if [ $REMOVE ] && ! [ $RC ] ; then
+if [ $REMOVE ] ; then
     sudo systemctl stop ${SERVICE_NAME}.service 
     sudo rm /lib/systemd/system/${SERVICE_NAME}.service
     sudo unlink /etc/systemd/system/multi-user.target.wants/${SERVICE_NAME}.service
     sudo systemctl daemon-reload
     echo "${SERVICE_NAME}.py is removed."
-elif [ $RC ] && ! [ $REMOVE ]; then
-    if grep -Fxq "sudo python3 ${SYSMONITOR_DIR}/${SERVICE_NAME}.py & > ${SYSMONITOR_DIR}/log.txt 2>&1" service/rc.local; then
-        echo "${SERVICE_NAME}.py is already installed."
-    else
-        pip3 install -r requirements.txt 
-        sudo sed -i "/^exit 0/i sudo python3 ${SYSMONITOR_DIR}/${SERVICE_NAME}.py & > ${SYSMONITOR_DIR}/log.txt 2>&1" ${RC_LOCAL_DIR}/rc.local
-        echo "${SERVICE_NAME}.py installed. Please reboot the system."
-    fi    
-elif [ $RC ] && [ $REMOVE ]; then
-    sudo grep -v "sudo python3 ${SYSMONITOR_DIR}/${SERVICE_NAME}.py & > ${SYSMONITOR_DIR}/log.txt 2>&1" ${RC_LOCAL_DIR}/rc.local > ${RC_LOCAL_DIR}/rc.local2;
-    sudo mv ${RC_LOCAL_DIR}/rc.local2 ${RC_LOCAL_DIR}/rc.local
-    echo "${SERVICE_NAME}.py removed. Please reboot the system."
 else
     pip3 install -r requirements.txt 
     sudo SYSMONITOR_DIR=${SYSMONITOR_DIR} USERNAME=${USERNAME} SERVICE_NAME=${SERVICE_NAME} envsubst < service/sysmonitor_test.service > ${SERVICE_NAME}.service

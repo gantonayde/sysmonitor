@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 
 import unittest
-from sysmonitor_example import get_mem_load, get_proc_by_memory, get_details_with_shell
+from sysmonitor_example import get_mem_usage, get_proc_by_memory, get_details_with_shell
 
 class TestSysmonitor(unittest.TestCase):
 
     def test_mem_load(self):
         """
-        Test that memory load can be measured.
+        Test that memory usage can be measured.
         """
-        self.assertTrue(get_mem_load())
+        self.assertTrue(get_mem_usage())
 
     def test_proc_list(self):
         """
