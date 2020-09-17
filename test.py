@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import unittest
-from sysmonitor import get_mem_load, get_proc_by_memory, get_details_with_shell
+from sysmonitor_example import get_mem_load, get_proc_by_memory, get_details_with_shell
 
 class TestSysmonitor(unittest.TestCase):
 
