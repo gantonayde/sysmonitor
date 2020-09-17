@@ -4,8 +4,9 @@
 
  [Service]
  Type=idle
- User=pi
- ExecStart=/usr/bin/python3 ${SYSMONITOR_DIR}/sysmonitor.py > ${SYSMONITOR_DIR}/sample.log 2>&1
+ WorkingDirectory=${SYSMONITOR_DIR}
+ User=${USERNAME}
+ ExecStart=/usr/bin/python3 ${SYSMONITOR_DIR}/${SERVICE_NAME}.py > ${SYSMONITOR_DIR}/sample.log 2>&1
 
  [Install]
  WantedBy=multi-user.target
