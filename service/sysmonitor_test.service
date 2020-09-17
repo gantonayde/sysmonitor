@@ -1,0 +1,11 @@
+ [Unit]
+ Description=System Monitor Test 
+ After=multi-user.target
+
+ [Service]
+ Type=idle
+ User=pi
+ ExecStart=/usr/bin/python3 ${SYSMONITOR_DIR}/sysmonitor.py > ${SYSMONITOR_DIR}/sample.log 2>&1
+
+ [Install]
+ WantedBy=multi-user.target
